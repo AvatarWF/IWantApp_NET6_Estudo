@@ -1,4 +1,5 @@
-﻿using IWantApp.Infra.Data;
+﻿using IWantApp.Domain.Products;
+using IWantApp.Infra.Data;
 
 namespace IWantApp.Endpoints.Categories;
 
@@ -10,7 +11,14 @@ public class CategoryPost
 
     public static IResult Action(CategoryRequest categoryRequest, ApplicationDbContext context)
     {
-        return Results.Ok("Ok");
-    }
+        var category = new Category(categoryRequest.Name, "Teste", "Teste");
 
+        if(!category.IsValid)
+            return Results.BadRequest(category.Notifications);
+
+        context.Categories.Add(category);
+        context.SaveChanges();
+
+        return Results.Created($"/categories/{category.id}", category.id);
+    }
 }
